@@ -34,4 +34,4 @@ useWatchCharacters(loveNoteballs, 50);
       placeholder="Do you love noteballs??"
     >
   </div>
-</template>
+</template>../store/Notes

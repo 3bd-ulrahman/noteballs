@@ -38,4 +38,4 @@ const updateNote = () => {
       </template>
     </AddEditNote>
   </div>
-</template>
+</template>@/store/Notes

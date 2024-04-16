@@ -2,8 +2,10 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { addDoc, collection, deleteDoc, doc, onSnapshot, orderBy, query, updateDoc } from "firebase/firestore";
 import { db } from '@/assets/js/firebase.js';
+import { emitter } from '@/emitter';
 
-const notesCollectionRef = collection(db, 'notes');
+const user = JSON.parse(window.localStorage.getItem('user'));
+const notesCollectionRef = collection(db, 'users', user.uid, 'notes');
 const notesCollectionQuery = query(notesCollectionRef, orderBy('date', 'desc'));
 
 export const useNotesStore = defineStore('notes', () => {
@@ -12,21 +14,25 @@ export const useNotesStore = defineStore('notes', () => {
   const notesLoaded = ref(false);
 
   async function index() {
-    onSnapshot(notesCollectionQuery, (querySnapshot) => {
+
+    const unsubscribe = onSnapshot(notesCollectionQuery, (querySnapshot) => {
       notesLoaded.value = false;
-      let notes = [];
+      notes.value = [];
+
       querySnapshot.forEach((doc) => {
-        notes.push({
+        notes.value.push({
           id: doc.id,
           content: doc.data().content,
           date: doc.data().date
         });
       });
-      setTimeout(() => {
-        this.notes = notes;
-        notesLoaded.value = true;
-      }, 5000);
+
+      notesLoaded.value = true;
+    }, error => {
+      console.log('Error getting documents: ', error);
     });
+
+    emitter.on('logout', unsubscribe )
   }
 
   function show(id) {

@@ -1,10 +1,10 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onBeforeMount } from 'vue';
 import NavBar from './components/Layouts/NavBar.vue';
-import { useNotesStore } from './stores/Notes';
+import { useAuthStore } from './stores/Auth';
 
-onMounted(() => {
-  useNotesStore().index();
+onBeforeMount(() => {
+  useAuthStore().init();
 });
 </script>
 

@@ -19,6 +19,8 @@ useWatchCharacters(newNote);
 
 // keyboard control
 onMounted(() => {
+  useNotesStore().index();
+
   const enterKeyHandler = (event) => {
     if (event.key === 'Enter') {
       addNote();

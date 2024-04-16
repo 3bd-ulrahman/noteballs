@@ -1,11 +1,29 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
+import { useAuthStore } from '@/stores/Auth';
 
 const register = ref(false);
 
 const formTitle = computed(() => {
   return register.value ? 'Register' : 'Login';
 });
+
+const credentials = reactive({
+  email: '',
+  password: ''
+});
+
+const submit = () => {
+  if (!credentials.email || !credentials.password) {
+    return alert('Please enter an email and password');
+  }
+
+  if (register.value) {
+    useAuthStore().register(credentials);
+  } else {
+    useAuthStore().login(credentials);
+  }
+}
 </script>
 
 <template>
@@ -24,15 +42,39 @@ const formTitle = computed(() => {
 
     <div class="card auth-form">
       <div class="card-content">
-        <div class="title has-text-centered">
-          {{ formTitle }}
-        </div>
-        <div class="content">
-          Lorem ipsum leo risus, porta ac consectetur ac, vestibulum at eros. Donec
-          id elit non mi porta gravida at eget metus. Cum sociis natoque penatibus
-          et magnis dis parturient montes, nascetur ridiculus mus. Cras mattis
-          consectetur purus sit amet fermentum.
-        </div>
+
+        <form @submit.prevent="submit">
+          <div class="title has-text-centered">
+            {{ formTitle }}
+          </div>
+
+          <div class="field">
+            <label class="label">Email</label>
+            <div class="control">
+              <input v-model="credentials.email"
+                class="input" type="email" placeholder="e.g. alexsmith@gmail.com"
+              >
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Password</label>
+            <div class="control">
+              <input v-model="credentials.password"
+                class="input" type="password" autocomplete="off" placeholder="Enter a password"
+              >
+            </div>
+          </div>
+
+          <div class="field is-grouped is-grouped-right">
+            <p class="control">
+              <button class="button is-primary">
+                {{ formTitle }}
+              </button>
+            </p>
+          </div>
+        </form>
+
       </div>
     </div>
 
@@ -44,4 +86,4 @@ const formTitle = computed(() => {
   max-width: 25em;
   margin: 0 auto;
 }
-</style>
+</style>@/store/Auth

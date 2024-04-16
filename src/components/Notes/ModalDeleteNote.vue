@@ -53,4 +53,4 @@ onMounted(() => {
     </div>
 
   </div>
-</template>
+</template>@/store/Notes.js

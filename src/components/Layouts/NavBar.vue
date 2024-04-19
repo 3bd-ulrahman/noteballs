@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { onClickOutside } from '@vueuse/core';
 import { useAuthStore } from '@/stores/Auth';
 
@@ -11,10 +11,6 @@ const navbarBurgerRef = ref(null);
 onClickOutside(navbarMenuRef, event => {
   showMobileNav.value = false
 }, {ignore: [navbarBurgerRef]});
-
-const user = computed(() => {
-  return JSON.parse(window.localStorage.getItem('user'));
-});
 
 const logout = () => {
   showMobileNav.value = false;
@@ -66,10 +62,10 @@ const logout = () => {
           >
             Stats
           </RouterLink>
-          <button @click="logout()" v-if="user"
+          <button @click="logout()" v-if="useAuthStore().user.uid"
             class="button is-success fas fa-align-left" style="height: 100%;"
           >
-            Log out {{ user.email }}
+            Log out {{ useAuthStore().user.email }}
           </button>
         </div>
       </div>

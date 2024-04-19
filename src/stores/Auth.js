@@ -3,16 +3,17 @@ import { auth } from '@/assets/js/firebase';
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { ref } from 'vue';
 import { emitter } from '@/emitter.js';
+import { useStorage } from '@vueuse/core';
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref({});
+  const user = useStorage('user', {});
+  const errorMessage = ref('');
 
   function init() {
     onAuthStateChanged(auth, (userCredential) => {
       if (userCredential) {
         user.value = userCredential;
       } else {
-        window.localStorage.removeItem('user');
         user.value = {};
       }
     })
@@ -24,7 +25,7 @@ export const useAuthStore = defineStore('auth', () => {
         const user = userCredential.user;
       })
       .catch((error) => {
-        console.log('error.message: ', error.message);
+        errorMessage.value = error.message.split(': ')[1];
       });
   }
 
@@ -32,30 +33,27 @@ export const useAuthStore = defineStore('auth', () => {
     signInWithEmailAndPassword(auth, credentials.email, credentials.password)
       .then((userCredential) => {
         user.value = userCredential.user;
-        window.localStorage.setItem('user', JSON.stringify(user.value));
-
         this.router.push('/notes');
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log('error.message', error.message);
+        errorMessage.value = error.message.split(': ')[1];
       });
   }
 
   function logout() {
     signOut(auth).then(() => {
-      localStorage.removeItem('user');
-
       getActivePinia()._s.forEach(store => {
+        if (store.$id === 'auth') {
+          return;
+        }
         store.$reset();
       });
 
+      user.value = {};
+
       emitter.emit('logout');
 
-      this.router.replace('/auth').then(() => {
-        window.location.reload();
-      });
+      this.router.replace('/auth');
     }).catch((error) => {
       console.log(error.message);
     });
@@ -63,6 +61,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     user,
+    errorMessage,
 
     init,
     register,

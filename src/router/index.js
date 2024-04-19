@@ -31,12 +31,10 @@ const router = createRouter({
 
 router.beforeEach(async (to, from) => {
   if (!useAuthStore().user.uid && to.name !== 'auth') {
-    console.log('redirecting to auth');
     return { name: 'auth' };
   }
 
   if (useAuthStore().user.uid && to.name === 'auth') {
-    console.log('redirecting to notes');
     return false;
   }
 });

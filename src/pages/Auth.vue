@@ -75,6 +75,10 @@ const submit = () => {
           </div>
         </form>
 
+        <p v-if="useAuthStore().errorMessage" class="has-text-danger">
+          *{{ useAuthStore().errorMessage }}
+        </p>
+
       </div>
     </div>
 
